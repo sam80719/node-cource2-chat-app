@@ -3,6 +3,7 @@ const http = require('http');
 const express = require('express');
 const socketIO = require('socket.io');
 
+const {generateMessage} = require('./utils/message');
 const publicPath = path.join(__dirname, '../public');
 const port = process.env.PORT || 3000;
 var app = express();
@@ -30,30 +31,39 @@ io.on('connection', (socket) => {
     // });
 
 
+
+    socket.emit('newMessage', generateMessage('admin', 'welcome to the chat app'));
+    socket.broadcast.emit('newMessage', generateMessage('admin','new user joined'));
+
+
     //socket.emit from admin text welcome to the chat app
     // socket.broadcast.emit from admin text new user joined
-    socket.emit('newMessage',{
-    	from: 'admin',
-    	text: 'welcome to the chat app',
-    	createAt: new Date().getTime() 
-    });
-
-    socket.broadcast.emit('newMessage', {
-    		from: 'admin',
-    		text: 'new user joined',
-    		createAt: new Date().getTime()    	
-    });
+    // emit觸發事件
+    // socket.emit('newMessage',{
+    // 	from: 'admin',
+    // 	text: 'welcome to the chat app',
+    // 	createAt: new Date().getTime() 
+    // });
+    // //broadcast 監聽與廣播事件
+    // socket.broadcast.emit('newMessage', {
+    // 		from: 'admin',
+    // 		text: 'new user joined',
+    // 		createAt: new Date().getTime()    	
+    // });
 
 
 
 
     socket.on('createMessage', (message)=>{
     	console.log('createMessage', message);
-    	io.emit('newMessage',{
-    		from: message.from,
-    		text: message.text,
-    		createAt: new Date().getTime()
-    	});
+
+    	io.emit('newMessage', generateMessage(message.from, message.text));
+
+    	// io.emit('newMessage',{
+    	// 	from: message.from,
+    	// 	text: message.text,
+    	// 	createAt: new Date().getTime()
+    	// });
     	// socket.broadcast.emit('newMessage', {
     	// 	from: message,
     	// 	text: message.text,
